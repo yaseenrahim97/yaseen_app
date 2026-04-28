@@ -6,33 +6,36 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # ensures all actions use Node.js 24 now
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-        
+
       - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-        
+
       - name: Run tests
         run: mvn clean test
-      
+
       - name: Build application
         run: mvn clean package -DskipTests
-      
+
       - name: Upload WAR file
         uses: actions/upload-artifact@v4
         with:
@@ -44,7 +47,7 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
       - name: Trigger Jenkins Deployment
         run: |
@@ -52,10 +55,10 @@ jobs:
                -H "Content-Type: application/json" \
                -d '{"ref": "${{ github.ref }}", "repository": "${{ github.repository }}"}'
           echo "Jenkins deployment triggered successfully"
-      
+
       - name: Wait for deployment
         run: sleep 30
-      
+
       - name: Validate deployment
         run: |
           echo "Checking application health..."
