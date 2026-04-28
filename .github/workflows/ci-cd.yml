@@ -7,12 +7,12 @@ on:
     branches: [ main ]
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # ensures all actions use Node.js 24 now
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # future-proof
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
+    ...
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
